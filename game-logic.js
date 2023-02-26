@@ -1,35 +1,41 @@
 /**
- * Here is where we should register event listeners and emitters. 
+ * game-logic.js
+ * 
+ * Aqui é onde devemos registrar os event listeners e emitters (connexão com o frontend). 
  */
 
 var io
 var gameSocket
-// gamesInSession stores an array of all active socket connections
+
+// gamesInSession armazena uma matriz de todas as conexões de "socket" ativas.
+// Ou seja, todas as sessões de jogo.
 var gamesInSession = []
 
 
 const initializeGame = (sio, socket) => {
-    /**
-     * initializeGame sets up all the socket event listeners. 
-     */
-
-    // initialize global variable.
+    /*
+    * initializeGame configura todos os event listeners e emitters.
+    * Quando o utilizador ativar um evento (disconnectar/connectar ou fazer um movimento no jogo)
+    * é pasado como um POST HTTP e é ouvido por o socket.
+    */
+   
+    // Inicialização das variáveis global.
     io = sio 
     gameSocket = socket 
 
-    // pushes this socket to an array which stores all the active sockets.
+    // Aditiona esse socket para uma matriz que armazena todos os sockets ativos.
     gamesInSession.push(gameSocket)
 
-    // Run code when the client disconnects from their socket session. 
+    // Execute o código quando o cliente se desconectar de sua sessão. 
     gameSocket.on("disconnect", onDisconnect)
 
-    // Sends new move to the other socket session in the same room. 
+    // Envia novo movimento no jogo para a outra sessão na mesma sala.
     gameSocket.on("new move", newMove)
 
-    // User creates new game room after clicking 'submit' on the frontend
+    // O utilizador cria uma nova sala de jogo depois de ter clicado no botão "começar" no frontend
     gameSocket.on("createNewGame", createNewGame)
 
-    // User joins gameRoom after going to a URL with '/game/:gameId' 
+    // O utilizador entra numa sala de jogo depois de ir para um URL com '/game/:gameId'
     gameSocket.on("playerJoinGame", playerJoinsGame)
 
     gameSocket.on('request username', requestUserName)
@@ -38,60 +44,55 @@ const initializeGame = (sio, socket) => {
 }
 
 function playerJoinsGame(idData) {
-    /**
-     * Joins the given socket to a session with it's gameId
-     */
-
-    // A reference to the player's Socket.IO socket object
+    // Entra o socket dado a uma sessão com seu gameId (id de jogo)
+    
+    // Uma referência ao objeto de soquete Socket.IO do jogador
     var sock = this
     
-    // Look up the room ID in the Socket.IO manager object.
+    // Procure o ID da sala no objeto gerado por Socket.IO.
     var room = io.sockets.adapter.rooms[idData.gameId]
-   // console.log(room)
 
-    // If the room exists...
+    // Se a sala não existe...
     if (room === undefined) {
-        this.emit('status' , "This game session does not exist." );
+        this.emit('status' , "Esta sessão de jogo não existe." );
         return
     }
+    // Se a sala tiver 2 ou menos jogadores...
     if (room.length <= 2) {
-        // attach the socket id to the data object.
+        // Anexe o id do socket ao objeto.
         idData.mySocketId = sock.id;
 
-        // Join the room
+        // Entra na sala
         sock.join(idData.gameId);
 
-        console.log(room.length)
-
+        // Se a sala tiver 2 jogadores...
         if (room.length === 2) {
             io.sockets.in(idData.gameId).emit('start game', idData.userName)
         }
 
-        // Emit an event notifying the clients that the player has joined the room.
+        // Emitir um evento notificando os clientes de que o jogador entrou na sala.
         io.sockets.in(idData.gameId).emit('playerJoinedRoom', idData);
 
     } else {
-        // Otherwise, send an error message back to the player.
-        this.emit('status' , "There are already 2 people playing in this room." );
+        // Caso contrário, envie uma mensagem de erro de volta para o jogador.
+        this.emit('status' , "Já há 2 pessoas a jogar nesta sala." );
     }
 }
 
-
 function createNewGame(gameId) {
-    // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
+    // Retorna o ID da sala (gameId) e o ID do socket (mySocketId) para o cliente do navegador
     this.emit('createNewGame', {gameId: gameId, mySocketId: this.id});
 
-    // Join the Room and wait for the other player
+    // Junte-se à Sala e aguarde o outro jogador
     this.join(gameId)
 }
 
 
 function newMove(move) {
-    /**
-     * First, we need to get the room ID in which to send this message. 
-     * Next, we actually send this message to everyone except the sender
-     * in this room. 
-     */
+    /*
+    * Primeiro, precisamos obter o ID da sala para enviar esta mensagem.
+    * Em seguida, enviamos esta mensagem para todos, exceto o remetente nesta sala. 
+    */
     
     const gameId = move.gameId 
     
@@ -99,6 +100,7 @@ function newMove(move) {
 }
 
 function onDisconnect() {
+    // disconecta o jogador
     var i = gamesInSession.indexOf(gameSocket);
     gamesInSession.splice(i, 1);
 }
