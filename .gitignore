@@ -1,1 +1,8 @@
+# vê https://help.github.com/articles/ignoring-files/ para saber mais sobre como ignorar arquivos.
+#
+# Um ficheiro .gitignore especifica oas pastas e ficheiros que não devem ser guardadas no Git
+# Neste caso, os modules de node.js podem ser reinstalados com o commando npm install e o ficheiro package.json
+# Por isso, podem ser ignorados
+
+# dependencies
 /node_modules
