@@ -29,5 +29,4 @@ const io = socketio(server)
 // Quando connecta no socket, vai para o ficheiro game-logic e utiliza a função initializeGame
 io.on('connection', client => {gameLogic.initializeGame(io, client)})
 
-// usually this is where we try to connect to our DB.
 server.listen(process.env.PORT || 8000)
