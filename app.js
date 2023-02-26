@@ -1,31 +1,38 @@
 const express = require('express')
-const http = require('http')
-const socketio = require('socket.io')
-const gameLogic = require('./game-logic')
 const app = express()
+const server = require('http').createServer(app)
+const io = require('socket.io').listen(server)
+const gameLogic = require('./game-logic')
 
-/**
- * Backend flow:
- * - check to see if the game ID encoded in the URL belongs to a valid game session in progress. 
- * - if yes, join the client to that game. 
- * - else, create a new game instance. 
- * - '/' path should lead to a new game instance. 
- * - '/game/:gameid' path should first search for a game instance, then join it. Otherwise, throw 404 error.  
- */
+io.on('connection', socket => {console.log("connection..."), gameLogic.initializeGame(io, socket)});
 
+server.listen(8000, () => {console.log("Server running...")})
 
-const server = http.createServer(app)
-const io = socketio(server)
+// const socketio = require('socket.io')
 
-// get the gameID encoded in the URL. 
-// check to see if that gameID matches with all the games currently in session. 
-// join the existing game session. 
-// create a new session.  
-// run when client connects
-
-io.on('connection', client => {
-    gameLogic.initializeGame(io, client)
-})
-
-// usually this is where we try to connect to our DB.
-server.listen(process.env.PORT || 8000)
+// 
+// 
+// /*
+// * backend flow: 
+// * - verifique se o ID do jogo codificado no URL pertence a uma sessão de jogo válida. 
+// * - se sim, junte o cliente a esse jogo. 
+// * - caso contrário, crie uma nova instância do jogo. 
+// * - O caminho '/' deve levar a uma nova instância do jogo.
+// * - O caminho '/game/:gameid' deve primeiro procurar por uma instância do jogo, depois juntá-la. Caso contrário, lance o erro 404. 
+// */
+// 
+// 
+// 
+// 
+// // obtém o gameID codificado na URL.
+// // verifica se esse gameID corresponde a todos os jogos atualmente em sessão.
+// // junte-se à sessão de jogo existente.
+// // cria uma nova sessão.
+// // executa quando o cliente se conecta
+// 
+// 
+// // Quando connecta no socket, vai para o ficheiro game-logic e utiliza a função initializeGame
+// io.on('connection', client => {gameLogic.initializeGame(io, client)})
+// 
+// // usually this is where we try to connect to our DB.
+// 

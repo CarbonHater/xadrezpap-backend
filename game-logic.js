@@ -8,13 +8,13 @@ var gameSocket
 var gamesInSession = []
 
 
-const initializeGame = (sio, socket) => {
+const initializeGame = (soketio, socket) => {
     /**
      * initializeGame sets up all the socket event listeners. 
      */
 
     // initialize global variable.
-    io = sio 
+    io = soketio
     gameSocket = socket 
 
     // pushes this socket to an array which stores all the active sockets.
