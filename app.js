@@ -1,10 +1,8 @@
 const express = require('express')
-const app = express()
-
 const http = require('http')
 const socketio = require('socket.io')
 const gameLogic = require('./game-logic')
-
+const app = express()
 
 /*
 * backend flow: 
@@ -14,7 +12,6 @@ const gameLogic = require('./game-logic')
 * - O caminho '/' deve levar a uma nova instância do jogo.
 * - O caminho '/game/:gameid' deve primeiro procurar por uma instância do jogo, depois juntá-la. Caso contrário, lance o erro 404. 
 */
-
 
 const server = http.createServer(app)
 const io = socketio(server)
