@@ -1,11 +1,8 @@
 const express = require('express')
-const https = require('https')
+const http = require('http')
 const socketio = require('socket.io')
 const gameLogic = require('./game-logic')
 const app = express()
-
-// https
-const port = 8000
 
 /*
 * backend flow: 
@@ -16,7 +13,7 @@ const port = 8000
 * - O caminho '/game/:gameid' deve primeiro procurar por uma instância do jogo, depois juntá-la. Caso contrário, lance o erro 404. 
 */
 
-const server = https.createServer(app)
+const server = http.createServer(app)
 const io = socketio(server)
 
 // obtém o gameID codificado na URL.
@@ -29,4 +26,4 @@ const io = socketio(server)
 // Quando connecta no socket, vai para o ficheiro game-logic e utiliza a função initializeGame
 io.on('connection', client => {gameLogic.initializeGame(io, client)})
 
-server.listen(port)
+server.listen(process.env.PORT || 8000)
