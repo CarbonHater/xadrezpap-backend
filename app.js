@@ -5,7 +5,7 @@ const gameLogic = require('./game-logic')
 const app = express()
 
 // https
-const port = 443
+const port = 8000
 
 /*
 * backend flow: 
