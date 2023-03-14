@@ -4,6 +4,9 @@ const socketio = require('socket.io')
 const gameLogic = require('./game-logic')
 const app = express()
 
+// https
+const port = 443
+
 /*
 * backend flow: 
 * - verifique se o ID do jogo codificado no URL pertence a uma sessão de jogo válida. 
@@ -26,4 +29,4 @@ const io = socketio(server)
 // Quando connecta no socket, vai para o ficheiro game-logic e utiliza a função initializeGame
 io.on('connection', client => {gameLogic.initializeGame(io, client)})
 
-server.listen(process.env.PORT || 8000)
+server.listen(process.env.PORT || port)
